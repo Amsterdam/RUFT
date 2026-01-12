@@ -1,0 +1,44 @@
+# RUFT Configuration
+# See https://github.com/Amsterdam/RUFT for documentation
+
+version: 1
+
+settings:
+  max_iterations: 3          # Max auto-fix iterations before giving up
+  auto_commit_fixes: true    # Commit auto-fixes automatically
+  commit_message_prefix: "Auto-fix:"  # Prefix for auto-commit messages
+
+git:
+  auto_push: false           # Push after all checks pass
+  require_clean_start: false # Require no uncommitted changes to start
+
+checks:
+  ruff_lint:
+    enabled: true
+    config_file: ".ruff.toml"
+    # extra_args: ["--select", "F,E,W"]
+
+  ruff_format:
+    enabled: true
+    config_file: ".ruff.toml"
+
+  mypy:
+    enabled: false           # Set to true if you have mypy installed
+    config_file: "pyproject.toml"  # Or mypy.ini
+
+  pytest:
+    enabled: false           # Set to true if you have pytest installed
+    test_dir: "tests"
+    extra_args: ["-v"]
+
+  # Custom checks (uncomment to use):
+  # custom:
+  #   - name: "Security Scan"
+  #     enabled: false
+  #     command: "bandit -r src/"
+  #     can_auto_fix: false
+  #
+  #   - name: "Dependency Audit"
+  #     enabled: false
+  #     command: "pip-audit"
+  #     can_auto_fix: false

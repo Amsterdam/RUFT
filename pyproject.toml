@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ruft"
+version = "1.0.0"
+description = "RUFT - Ruff-based Universal Fixer Tool: A transparent quality check and auto-fix workflow"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Amsterdam", email = "datateam@amsterdam.nl" }
+]
+keywords = ["ruff", "linting", "formatting", "code-quality", "git-workflow", "auto-fix"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+]
+
+dependencies = [
+    "ruff>=0.4.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+mypy = ["mypy>=1.0.0"]
+pytest = ["pytest>=7.0.0"]
+all = ["ruft[mypy,pytest]"]
+dev = [
+    "ruft[all]",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+ruft = "ruft.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Amsterdam/RUFT"
+Documentation = "https://github.com/Amsterdam/RUFT#readme"
+Repository = "https://github.com/Amsterdam/RUFT"
+Issues = "https://github.com/Amsterdam/RUFT/issues"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ruft"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I", "N", "D", "UP", "ANN", "C4", "PIE", "T20", "RET", "SIM", "PL", "RUF"]
+ignore = ["D203", "D212", "D205", "D401", "ANN002", "ANN003", "PLR2004"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D", "ANN"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_ignores = true
+show_error_codes = true

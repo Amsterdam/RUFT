@@ -1,0 +1,74 @@
+# Ruff configuration - bundled defaults from RUFT
+# See https://docs.astral.sh/ruff/configuration/ for all options
+
+line-length = 120
+
+[lint]
+select = [
+    "F",     # pyflakes
+    "E",     # pycodestyle (Errors)
+    "W",     # pycodestyle (Warnings)
+    "C90",   # mccabe (complexity)
+    "I",     # isort
+    "N",     # pep8 naming
+    "D",     # pydocstyle
+    "UP",    # pyupgrade
+    "ANN",   # flake8-annotations
+    "ASYNC", # flake8-async
+    "A",     # flake8-builtins
+    "COM",   # flake8-commas
+    "C4",    # flake8-comprehensions
+    "DTZ",   # flake8-datetimez
+    "EXE",   # flake8-executable
+    "ISC",   # flake8-implicit-str-concat
+    "ICN",   # flake8-import-conventions
+    "PIE",   # flake8-pie
+    "T20",   # flake8-print
+    "PT",    # flake8-pytest-style
+    "Q",     # flake8-quotes
+    "RSE",   # flake8-raise
+    "RET",   # flake8-return
+    "SLF",   # flake8-self
+    "SIM",   # flake8-simplify
+    "ARG",   # flake8-unused-arguments
+    "PL",    # pylint
+    "TRY",   # tryceratops
+    "PERF",  # Perflint
+    "RUF",   # Ruff-specific rules
+]
+
+ignore = [
+    # Docstring conflicts
+    "D203",   # blank-line-before-class (conflicts with D211)
+    "D212",   # multi-line-summary-first-line (conflicts with D213)
+    "D205",   # blank-line-after-summary
+    "D401",   # non-imperative-mood
+
+    # Annotation flexibility
+    "ANN002", # missing-type-args
+    "ANN003", # missing-type-kwargs
+
+    # Formatting conflicts (let ruff format handle these)
+    "ISC001", # single-line-implicit-string-concatenation
+    "COM812", # missing-trailing-comma
+
+    # Overly strict rules
+    "PLR2004", # magic-value-comparison
+    "TRY003",  # raise-vanilla-args
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[lint.pylint]
+max-statements = 60
+
+[lint.per-file-ignores]
+# Allow unused imports in __init__.py files
+"**/__init__.py" = ["F401"]
+# Test files can access private members
+"tests/**/*.py" = ["SLF001", "D", "ANN"]
+# CLI scripts can use print statements
+"scripts/**/*.py" = ["T201"]
