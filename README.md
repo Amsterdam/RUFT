@@ -198,34 +198,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Install dependencies
         run: |
           pip install ruff mypy pytest
-          pip install -r requirements.txt  # if you have one
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f pyproject.toml ]; then pip install -e .; fi
 
-      - name: Ruff lint
-        run: ruff check .
-
-      - name: Ruff format
-        run: ruff format --check .
+      - name: Ruff
+        run: ruff check . && ruff format --check .
 
       - name: MyPy
         run: mypy .
 
       - name: Tests
-        run: pytest tests/
+        run: pytest
 ```
 
-### Workflow Design
+This workflow auto-detects your project setup and works with any Python project structure.
 
-Each check runs as a separate step so that:
-1. Errors show full output in the GitHub Actions log
-2. You can see exactly which check failed and why
-3. Platform-specific issues (e.g., mypy finding something on Linux but not Windows) are visible
-
-When CI fails, developers run `ruft` locally to auto-fix what can be fixed, then address remaining issues shown in the CI output.
+When CI fails, run `ruft` locally to auto-fix issues, then address any remaining errors shown in the CI output.
 
 ### Blocking Merges on Failure
 
