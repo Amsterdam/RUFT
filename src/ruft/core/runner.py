@@ -165,8 +165,14 @@ class Runner:
 
             if not check_class.is_available():
                 yellow = Colors.YELLOW if supports_color() else ""
+                cyan = Colors.CYAN if supports_color() else ""
                 reset = Colors.RESET if supports_color() else ""
-                print(f"{yellow}[!] Check '{name}' not available (missing dependency){reset}")
+                install_hint = {
+                    "mypy": "pip install ruft[mypy]",
+                    "pytest": "pip install ruft[pytest]",
+                }.get(name, "pip install ruft[all]")
+                print(f"{yellow}[!] Check '{name}' not available{reset}")
+                print(f"    Install with: {cyan}{install_hint}{reset}")
                 continue
 
             checks.append(check_class(check_config))
