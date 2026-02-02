@@ -126,6 +126,62 @@ checks:
       can_auto_fix: false
 ```
 
+## GitHub Actions
+
+Use RUFT in your CI/CD pipeline to enforce code quality on every push and pull request.
+
+[![RUFT Quality Check](https://github.com/Amsterdam/RUFT/actions/workflows/ruft.yml/badge.svg)](https://github.com/Amsterdam/RUFT/actions/workflows/ruft.yml)
+
+### Example Workflow
+
+Create `.github/workflows/ruft.yml` in your repository:
+
+```yaml
+name: RUFT Quality Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install RUFT
+        run: pip install "git+https://github.com/Amsterdam/RUFT.git#egg=ruft[all]"
+
+      - name: Run quality checks
+        run: ruft --dry-run
+```
+
+### CI Mode Options
+
+| Flag | Use Case |
+|------|----------|
+| `--dry-run` | Validate without modifying files (recommended for CI) |
+| `--no-push` | Allow commits but prevent push (less common in CI) |
+
+### Blocking Merges on Failure
+
+To require passing checks before merging:
+
+1. Go to your repository **Settings** → **Branches**
+2. Add or edit a branch protection rule for `main`
+3. Enable **"Require status checks to pass before merging"**
+4. Select **"quality-check"** from the list
+
 ## CLI Reference
 
 ```

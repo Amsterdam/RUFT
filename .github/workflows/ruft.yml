@@ -1,0 +1,27 @@
+name: RUFT Quality Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install RUFT
+        run: pip install "git+https://github.com/Amsterdam/RUFT.git#egg=ruft[all]"
+
+      - name: Run quality checks
+        run: ruft --dry-run
