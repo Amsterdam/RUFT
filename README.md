@@ -2,6 +2,40 @@
 
 A transparent, configurable quality check and auto-fix workflow for Python projects.
 
+<details>
+<summary><b>See it in action</b> (click to expand)</summary>
+
+**Before** - Code with issues:
+```python
+import os,sys
+from typing import *
+def calculate_thing(x,y,z):
+  result=x+y*z
+  unused_var = 42
+  return result
+class myClass:
+    def __init__(self,value):self.value=value
+```
+
+**What RUFT detects:**
+- `ruff check`: Unused imports (`os`, `sys`), wildcard import, unused variable, naming convention (`myClass` → `MyClass`)
+- `ruff format`: Spacing, indentation, line length
+- `mypy`: Missing type annotations
+
+**After** - Auto-fixed:
+```python
+def calculate_thing(x: float, y: float, z: float) -> float:
+    result = x + y * z
+    return result
+
+
+class MyClass:
+    def __init__(self, value: int) -> None:
+        self.value = value
+```
+
+</details>
+
 ## Features
 
 - **Iterative auto-fix**: Runs checks in a loop until no more fixes are possible
@@ -128,16 +162,23 @@ checks:
 
 ## GitHub Actions
 
-Use RUFT in your CI/CD pipeline to enforce code quality on every push and pull request.
+Enforce code quality in CI/CD by running the same checks RUFT uses locally.
 
-[![RUFT Quality Check](https://github.com/Amsterdam/RUFT/actions/workflows/ruft.yml/badge.svg)](https://github.com/Amsterdam/RUFT/actions/workflows/ruft.yml)
+[![Code Quality](https://github.com/Amsterdam/RUFT/actions/workflows/ruft.yml/badge.svg)](https://github.com/Amsterdam/RUFT/actions/workflows/ruft.yml)
+
+### Recommended Approach
+
+Run the raw tools directly in CI rather than RUFT itself. This ensures:
+- **Full error output visible** - Platform-specific issues (Ubuntu CI vs Windows local) are shown in detail
+- **No hidden failures** - Each check's errors are clearly visible in the pipeline logs
+- **Developers use RUFT locally** - To auto-fix issues caught by CI
 
 ### Example Workflow
 
-Create `.github/workflows/ruft.yml` in your repository:
+Create `.github/workflows/ci.yml` in your repository:
 
 ```yaml
-name: RUFT Quality Check
+name: Code Quality
 
 on:
   push:
@@ -159,19 +200,32 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install RUFT
-        run: pip install "git+https://github.com/Amsterdam/RUFT.git#egg=ruft[all]"
+      - name: Install dependencies
+        run: |
+          pip install ruff mypy pytest
+          pip install -r requirements.txt  # if you have one
 
-      - name: Run quality checks
-        run: ruft --dry-run
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format
+        run: ruff format --check .
+
+      - name: MyPy
+        run: mypy .
+
+      - name: Tests
+        run: pytest tests/
 ```
 
-### CI Mode Options
+### Workflow Design
 
-| Flag | Use Case |
-|------|----------|
-| `--dry-run` | Validate without modifying files (recommended for CI) |
-| `--no-push` | Allow commits but prevent push (less common in CI) |
+Each check runs as a separate step so that:
+1. Errors show full output in the GitHub Actions log
+2. You can see exactly which check failed and why
+3. Platform-specific issues (e.g., mypy finding something on Linux but not Windows) are visible
+
+When CI fails, developers run `ruft` locally to auto-fix what can be fixed, then address remaining issues shown in the CI output.
 
 ### Blocking Merges on Failure
 
